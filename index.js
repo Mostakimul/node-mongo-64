@@ -6,6 +6,7 @@ const app = express();
 const port = 8000;
 // Middleware
 app.use(cors());
+app.use(express.json());
 dotenv.config();
 const user = process.env.USER;
 const password = process.env.PASSWORD;
@@ -25,18 +26,17 @@ async function run() {
     // create a collection or fetch if alredy have
     const usersCollection = database.collection('users');
 
-    // create a document to insert
-    const doc = {
-      name: 'Karim',
-      email: 'karim@gmail.com',
-    };
-    // inserting document to userCollection
-    const result = await usersCollection.insertOne(doc);
-    console.log(`A document inserted with id: ${result.insertedId}`);
+    // POST API
+    app.post('/user', async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
   } finally {
-    await client.close();
+    // await client.close();
   }
 }
+// Running the run function
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
