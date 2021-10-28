@@ -36,13 +36,37 @@ async function run() {
     // Get API for all users
     app.get('/users', async (req, res) => {
       const result = await usersCollection.find({}).toArray();
-      // console.log(result);
       res.send(result);
     });
     // Delete single user
     app.delete('/delete-user/:id', async (req, res) => {
       const id = req.params.id;
       const result = await usersCollection.deleteOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+    // Fetch single user
+    app.get('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await usersCollection.findOne({ _id: ObjectId(id) });
+      res.send(result);
+    });
+    // update User
+    app.put('/update/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedUser = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+        },
+      };
+      const result = await usersCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
   } finally {
